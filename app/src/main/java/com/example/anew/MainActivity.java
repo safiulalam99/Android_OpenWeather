@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         // 2. send some data to the other activity with the intent
 
         // parameters: key for the data AND valiue  for the data
-       // intent.putExtra("CITY_NAME", "Tampere");
         // 3. start acticity through intent
         startActivity(intent);
     }
@@ -65,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
             response -> {
                 //callback for successful request
+//                Toast.makeText(this, response, Toast.LENGTH_LONG).show();
 
                 //1 . parse the data from json object
                 parseJsonAndUpdateUI(response);

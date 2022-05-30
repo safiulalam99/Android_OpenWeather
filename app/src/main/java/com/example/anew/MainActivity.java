@@ -63,6 +63,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         savedInstanceState.putString("wName",locationName);
         savedInstanceState.putInt("temp",temperature);
         savedInstanceState.putDouble("wind",windspeed);
+        savedInstanceState.putDouble("feelslike",feelslike);
+        savedInstanceState.putDouble("pressure",pressure);
+        savedInstanceState.putDouble("humidity",humidity);
 
 
     }
@@ -86,16 +89,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             TextView windspeedTextView = findViewById(R.id.TextViewWindspeed);
             windspeedTextView.setText("Wind "+windspeed+"m/s");
+
             TextView temperatureTextView = findViewById(R.id.textViewTemperature);
             temperatureTextView.setText(""+temperature+ "C");
+
             TextView feels = findViewById(R.id.feelslikeView);
-            feels.setText("Feels like "+feelslike+"m/s");
+            feels.setText("Feels like "+feelslike+"");
 
             TextView press = findViewById(R.id.pressureView);
-            press.setText("Pressure "+pressure+"m/s");
+            press.setText("Pressure "+pressure+"");
 
             TextView humid = findViewById(R.id.humidityView);
-            humid.setText("Humidity "+humidity+"m/s");
+            humid.setText("Humidity "+humidity+"");
 
         }
         else
@@ -138,14 +143,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             JSONObject weather = new JSONObject(response);
 
 //            temperature = weather.getJSONObject("main").getDouble("temp");
-
+            feelslike = weather.getJSONArray("list").getJSONObject(0).getJSONObject("main").getInt("feels_like");
+            pressure = weather.getJSONArray("list").getJSONObject(0).getJSONObject("main").getInt("pressure");
+            humidity = weather.getJSONArray("list").getJSONObject(0).getJSONObject("main").getInt("humidity");
             temperature = weather.getJSONArray("list").getJSONObject(0).getJSONObject("main").getInt("temp");
             locationName = weather.getJSONArray("list").getJSONObject(0).getString("name");
             windspeed = weather.getJSONArray("list").getJSONObject(0).getJSONObject("wind").getDouble("speed");
             weatherDescription = weather.getJSONObject("list").getJSONArray("weather").getJSONObject(0).getString("description");
-            feelslike = weather.getJSONArray("list").getJSONObject(0).getJSONObject("main").getInt("feels_like");
-            humidity = weather.getJSONArray("list").getJSONObject(0).getJSONObject("main").getInt("humidity");
-            pressure = weather.getJSONArray("list").getJSONObject(0).getJSONObject("main").getInt("pressure");
+
 
 
         }catch (JSONException e){
@@ -165,16 +170,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         temperatureTextView.setText(""+temperature+ "C");
         //wind
         TextView windspeedTextView = findViewById(R.id.TextViewWindspeed);
-        windspeedTextView.setText("Wind "+windspeed+"m/s");
+        windspeedTextView.setText("Wind "+windspeed+"");
 
         TextView feels = findViewById(R.id.feelslikeView);
-        feels.setText("Feels like "+"12"+"");
+        feels.setText("Feels like "+feelslike+"");
 
         TextView press = findViewById(R.id.pressureView);
-        press.setText("Pressure "+"1015");
+        press.setText("Pressure "+pressure+"");
 
         TextView humid = findViewById(R.id.humidityView);
-        humid.setText("Humidity "+"89"+"");
+        humid.setText("Humidity "+humidity+"");
     }
 
     public void startGPS(View view) {
@@ -196,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             );
             return;
         }
-        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 10000, 0,  this);
+        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 1000000, 0,  this);
 //            double latitude = lastknownLocation.getLatitude();
 
             if(latitude!=0.0 && longitude!=0.0){
@@ -220,8 +225,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         //
-        //Todo : update UI
-
+        Toast.makeText(this, "Data fetched", Toast.LENGTH_SHORT).show();
     }
 
 

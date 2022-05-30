@@ -73,6 +73,7 @@ public class forecastActivity extends AppCompatActivity {
             weatherDescription = weather.getJSONArray("weather").getJSONObject(0).getString("description");
             humidity =  weather.getJSONObject("main").getInt("humidity");
             pressure =  weather.getJSONObject("main").getInt("pressure");
+            windspeed =  weather.getJSONObject("wind").getDouble("speed");
 
         }catch (JSONException e){
             e.printStackTrace();

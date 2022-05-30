@@ -9,10 +9,11 @@ import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 
-import org.w3c.dom.Text;
-
 public class forecastActivity extends AppCompatActivity {
     private RequestQueue queue; //= Volley.newRequestQueue(this);
+    String apiKey="863c718b89bcf17e9c84a17bfcf0f18b";
+    String api1="https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,13 +22,19 @@ public class forecastActivity extends AppCompatActivity {
         //Read intent data if available//
         // if there is city name given. Read it and put it on screen
         // if string extra is noat there z`
-        String cityName = getIntent().getStringExtra("CITY_NAME");
+        Bundle bundle = getIntent().getExtras();
+//        Double latitude = bundle.getDouble("lat");
+        String longitude = bundle.getString("long");
+        String latitude = bundle.getString("lat");
         // lets put the intent on the scREEN
-        TextView weatherForecastCityName = findViewById(R.id.textViewForecastCityName);
-        if(cityName != null) {
-            weatherForecastCityName.setText(cityName);
+        TextView lat = findViewById(R.id.foreCastName);
+        TextView lon = findViewById(R.id.forecastTemp);
+        if(true) {
+            lat.setText(""+latitude);
+            lon.setText(""+longitude);
         }else {
-            weatherForecastCityName.setText("Helsinki");
+            lat.setText(""+"Error");
+            lon.setText(""+"Error");
         }
         }
 

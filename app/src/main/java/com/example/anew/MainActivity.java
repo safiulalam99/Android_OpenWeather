@@ -21,6 +21,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,121 +32,78 @@ import android.location.Location;
 import java.util.Arrays;
 
 
-public class MainActivity extends AppCompatActivity implements LocationListener{
-    private RequestQueue  queue; //= Volley.newRequestQueue(this);
+public class MainActivity extends AppCompatActivity implements LocationListener {
+    private RequestQueue queue; //= Volley.newRequestQueue(this);
     Location location;
-    String url,str;
-    double longitude, latitude;
+    String url, str;
+    TextView tvLat, tvLong;
+    double longitude;
+    double latitude;
+    String weatherDescription ;
+    int temperature;
+    double windspeed ;
+    String locationName ;
     String url1 = "https://api.openweathermap.org/data/2.5/find?q=";
     String url2 = "&units=metric&appid=863c718b89bcf17e9c84a17bfcf0f18b";
     EditText userLocationInput;
     String mainUrl = "https://api.openweathermap.org/data/2.5/find?q=dhaka&units=metric&appid=863c718b89bcf17e9c84a17bfcf0f18b";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // inCreate method ot set up the gui
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TextView locationInput = (TextView) findViewById(R.id.userInput);
+        tvLat = findViewById(R.id.latLong2);
         //instantiate the requests queue
 
         queue = Volley.newRequestQueue(this);
     }
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
 
-    public void fetchData(){
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                response -> {
-                    //callback for successful request
-//                Toast.makeText(this, response, Toast.LENGTH_LONG).show();
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putDouble("lat",latitude);
+        savedInstanceState.putDouble("long",longitude);
+        savedInstanceState.putString("wDescription",weatherDescription);
+        savedInstanceState.putString("wName",locationName);
+        savedInstanceState.putInt("temp",temperature);
+        savedInstanceState.putDouble("wind",windspeed);
 
-                    //1 . parse the data from json object
-                    parseJsonAndUpdateUI(response);
-                }, error -> {
 
-            Toast.makeText(this, "some error", Toast.LENGTH_LONG).show();
-            //callback for wheneevr something goes wring
-        }
-        );
-        queue.add(stringRequest);
     }
-
-    private void getLocation(){
-        if(checkPermissions())
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState)
+    {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(savedInstanceState!=null)
         {
-            if(isLocationEnabled())
-            {
-                //FInal lat and long
-//                fusedLocation
-            }
-            else
-            {
-               // open setting
-                Toast.makeText(this, "Turn on location", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-
-            }
+            latitude = savedInstanceState.getDouble("lat");
+            longitude = savedInstanceState.getDouble("long");
+            windspeed = savedInstanceState.getDouble("wind");
+            weatherDescription = savedInstanceState.getString("wDescription");
+            locationName = savedInstanceState.getString("wName");
+            temperature = savedInstanceState.getInt("temp");;
+            TextView textview = findViewById(R.id.textViewName);
+            textview.setText(locationName);
+            TextView weatherdescriptionTextView =  findViewById(R.id.textViewWeatherDescription);
+            weatherdescriptionTextView.setText(weatherDescription);
+            TextView windspeedTextView = findViewById(R.id.TextViewWindspeed);
+            windspeedTextView.setText(""+windspeed+"m/s");
+            TextView temperatureTextView = findViewById(R.id.textViewTemperature);
+            temperatureTextView.setText(""+temperature+ "C");
         }
         else
         {
-            //req permission again
-            requestPermission();
-    }
-    }
-
-    private boolean isLocationEnabled() {
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)||locationManager.isProviderEnabled(
-                LocationManager.NETWORK_PROVIDER );
-    }
-
-
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(
-                this,  new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION},100
-        );
-    }
-
-    public boolean checkPermissions(){
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION)
-        ==PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode==100)
-        {
-            if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            {
-                Toast.makeText(this, "Granted", Toast.LENGTH_LONG).show();
-            }
-            else {
-                Toast.makeText(this, "Denied", Toast.LENGTH_LONG).show();
-            }
+            Toast.makeText(this,"Error", Toast.LENGTH_LONG).show();
         }
     }
 
-    public void openForecast(View view) {
-        //opening forecast Button when clicked
-        // 1. Create an intent for opening ForecastActiity
-        Intent intent = new Intent(this, forecastActivity.class);
-        // 2. send some data to the other activity with the intent
-
-        // parameters: key for the data AND value  for the data
-        // 3. start acticity through intent
-        startActivity(intent);
-    }
 
     public void  updateWeather(View view)  {
         // Todo: gett he user input
         userLocationInput = (EditText)findViewById(R.id.userInput);
-        str = userLocationInput.getText().toString();
+        str = userLocationInput.getText().toString().trim();
         url = url1+str+url2;
 
         //replaca rhtis with real data
@@ -159,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 parseJsonAndUpdateUI(response);
             }, error -> {
 
-            Toast.makeText(this, "some error", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "No location", Toast.LENGTH_LONG).show();
             //callback for wheneevr something goes wring
         }
         );
@@ -167,30 +126,35 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     }
 
     private void parseJsonAndUpdateUI(String response) {
-        String weatherDescription ="cloudy";
-        double temperature = 2;
-        double windspeed = 3;
-        String locationName = "";
 
         //parse the data from api
         //1. Convert the response ro json objext
         try {
             JSONObject weather = new JSONObject(response);
+
 //            temperature = weather.getJSONObject("main").getDouble("temp");
-            temperature = weather.getJSONArray("list").getJSONObject(0).getJSONObject("main").getDouble("temp");
-            weatherDescription = weather.getJSONArray("list").getJSONObject(0).getString("name");
+
+            temperature = weather.getJSONArray("list").getJSONObject(0).getJSONObject("main").getInt("temp");
             locationName = weather.getJSONArray("list").getJSONObject(0).getString("name");
             windspeed = weather.getJSONArray("list").getJSONObject(0).getJSONObject("wind").getDouble("speed");
+            weatherDescription = weather.getJSONObject("list").getJSONArray("weather").getJSONObject(0).getString("description");
+
         }catch (JSONException e){
             e.printStackTrace();
         }
-        tempData(weatherDescription, temperature, windspeed);
+        tempData();
+
 
     }
 
-    public void tempData(String weatherDescription, double temperature, double windspeed){
+    public void tempData(){
+        //name
+        TextView weathertextViewName=  findViewById(R.id.textViewName);
+        weathertextViewName.setText(""+locationName);
+
+        // weather description
         TextView weatherdescriptionTextView =  findViewById(R.id.textViewWeatherDescription);
-        weatherdescriptionTextView.setText(weatherDescription);
+        weatherdescriptionTextView.setText(""+weatherDescription+"");
         // temp
         TextView temperatureTextView = findViewById(R.id.textViewTemperature);
         temperatureTextView.setText(""+temperature+ "C");
@@ -199,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         windspeedTextView.setText(""+windspeed+"m/s");
     }
 
-    public void startGPS() {
+    public void startGPS(View view) {
         //todo: start listening to users location through the Location manager
         // Todo 1: -location permission specified in android manifest file
         // Todo 2: ask users permission run-time before accessing GPS (dangerous permission)
@@ -212,32 +176,31 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         // todo if not, prompt the user
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: We dont have permission so ask it here
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},
+            ActivityCompat.requestPermissions(this,new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},
                     0
             );
             return;
         }
-        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 0, 0, (LocationListener) this);
+        locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER, 10000, 0,  this);
 //            double latitude = lastknownLocation.getLatitude();
 
-    }
-    public void loc( View view) {
-        try {
-            startGPS();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+            if(latitude!=0.0 && longitude!=0.0){
+                Intent intent = new Intent(this, forecastActivity.class);
+                Bundle bundle = new Bundle();
+//                bundle.putDouble("Lat", latitude);
+                bundle.putString("lat", String.valueOf(latitude));
+                bundle.putString("long", String.valueOf(longitude));
 
-        // we now can read the lat and long from the "location" parameter
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-        //
-        //Todo : update UI
-        TextView gpsTextView = (TextView) findViewById(R.id.latLong);
-        gpsTextView.setText("Lat: "+latitude + "\nLong: "+longitude);
+
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }else{
+                Toast.makeText(this, "Fetching..", Toast.LENGTH_SHORT).show();
+            }
     }
-    @Override
+
+//    @Override
     public void onLocationChanged( Location location) {
         // we now can read the lat and long from the "location" parameter
         latitude = location.getLatitude();

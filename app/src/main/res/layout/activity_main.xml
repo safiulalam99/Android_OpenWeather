@@ -13,7 +13,6 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="204dp"
         android:layout_marginEnd="24dp"
-        android:text="6 C"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="@id/textViewName"
         app:layout_constraintHorizontal_bias="0.333"
@@ -27,7 +26,6 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="248dp"
         android:layout_marginEnd="24dp"
-        android:text="9m/s"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="@id/textViewName"
         app:layout_constraintHorizontal_bias="0.333"
@@ -41,7 +39,19 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="300dp"
         android:layout_marginEnd="24dp"
-        android:text="9m/s"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="@id/textViewName"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/latLong2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="356dp"
+        android:layout_marginEnd="24dp"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="@id/textViewName"
         app:layout_constraintHorizontal_bias="0.0"
@@ -55,7 +65,6 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="84dp"
         android:layout_marginEnd="24dp"
-        android:text="Tampere"
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -70,7 +79,6 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="160dp"
         android:layout_marginEnd="24dp"
-        android:text="Sunny"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="@id/textViewName"
         app:layout_constraintHorizontal_bias="0.0"
@@ -102,7 +110,7 @@
         android:layout_marginBottom="84dp"
         android:background="@color/teal_200"
         android:backgroundTint="#00BCD4"
-        android:onClick="openForecast"
+        android:onClick="startGPS"
         android:text="Forecast"
         android:textColorHighlight="#050303"
         android:textColorHint="#FFFFFF"
@@ -124,18 +132,5 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="37dp"
-        android:layout_marginTop="166dp"
-        android:layout_marginBottom="47dp"
-        android:onClick="loc"
-        android:text="Button"
-        app:layout_constraintBottom_toTopOf="@+id/button2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/latLong" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

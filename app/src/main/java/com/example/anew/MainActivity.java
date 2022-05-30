@@ -1,6 +1,5 @@
 package com.example.anew;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -10,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -21,15 +19,11 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.location.Location;
-
-import java.util.Arrays;
 
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
@@ -40,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     double longitude;
     double latitude;
     String weatherDescription ;
-    int temperature;
+    int temperature, feelslike, pressure,humidity;
     double windspeed ;
     String locationName ;
     String url1 = "https://api.openweathermap.org/data/2.5/find?q=";
@@ -54,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TextView locationInput = (TextView) findViewById(R.id.userInput);
-        tvLat = findViewById(R.id.latLong2);
+        tvLat = findViewById(R.id.humidityView);
         //instantiate the requests queue
 
         queue = Volley.newRequestQueue(this);
@@ -83,15 +77,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             windspeed = savedInstanceState.getDouble("wind");
             weatherDescription = savedInstanceState.getString("wDescription");
             locationName = savedInstanceState.getString("wName");
-            temperature = savedInstanceState.getInt("temp");;
+            temperature = savedInstanceState.getInt("temp");
+            feelslike = savedInstanceState.getInt("feelslike");;
+            humidity = savedInstanceState.getInt("humidity");;
+            pressure = savedInstanceState.getInt("pressure");;
             TextView textview = findViewById(R.id.textViewName);
             textview.setText(locationName);
-            TextView weatherdescriptionTextView =  findViewById(R.id.textViewWeatherDescription);
-            weatherdescriptionTextView.setText(weatherDescription);
+
             TextView windspeedTextView = findViewById(R.id.TextViewWindspeed);
-            windspeedTextView.setText(""+windspeed+"m/s");
+            windspeedTextView.setText("Wind "+windspeed+"m/s");
             TextView temperatureTextView = findViewById(R.id.textViewTemperature);
             temperatureTextView.setText(""+temperature+ "C");
+            TextView feels = findViewById(R.id.feelslikeView);
+            feels.setText("Feels like "+feelslike+"m/s");
+
+            TextView press = findViewById(R.id.pressureView);
+            press.setText("Pressure "+pressure+"m/s");
+
+            TextView humid = findViewById(R.id.humidityView);
+            humid.setText("Humidity "+humidity+"m/s");
+
         }
         else
         {
@@ -138,13 +143,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             locationName = weather.getJSONArray("list").getJSONObject(0).getString("name");
             windspeed = weather.getJSONArray("list").getJSONObject(0).getJSONObject("wind").getDouble("speed");
             weatherDescription = weather.getJSONObject("list").getJSONArray("weather").getJSONObject(0).getString("description");
+            feelslike = weather.getJSONArray("list").getJSONObject(0).getJSONObject("main").getInt("feels_like");
+            humidity = weather.getJSONArray("list").getJSONObject(0).getJSONObject("main").getInt("humidity");
+            pressure = weather.getJSONArray("list").getJSONObject(0).getJSONObject("main").getInt("pressure");
+
 
         }catch (JSONException e){
             e.printStackTrace();
         }
         tempData();
-
-
     }
 
     public void tempData(){
@@ -152,15 +159,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         TextView weathertextViewName=  findViewById(R.id.textViewName);
         weathertextViewName.setText(""+locationName);
 
-        // weather description
-        TextView weatherdescriptionTextView =  findViewById(R.id.textViewWeatherDescription);
-        weatherdescriptionTextView.setText(""+weatherDescription+"");
+
         // temp
         TextView temperatureTextView = findViewById(R.id.textViewTemperature);
         temperatureTextView.setText(""+temperature+ "C");
         //wind
         TextView windspeedTextView = findViewById(R.id.TextViewWindspeed);
-        windspeedTextView.setText(""+windspeed+"m/s");
+        windspeedTextView.setText("Wind "+windspeed+"m/s");
+
+        TextView feels = findViewById(R.id.feelslikeView);
+        feels.setText("Feels like "+"12"+"");
+
+        TextView press = findViewById(R.id.pressureView);
+        press.setText("Pressure "+"1015");
+
+        TextView humid = findViewById(R.id.humidityView);
+        humid.setText("Humidity "+"89"+"");
     }
 
     public void startGPS(View view) {
@@ -207,8 +221,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         longitude = location.getLongitude();
         //
         //Todo : update UI
-        TextView gpsTextView = (TextView) findViewById(R.id.latLong);
-        gpsTextView.setText("Lat: "+latitude + "\nLong: "+longitude);
+
     }
 
 

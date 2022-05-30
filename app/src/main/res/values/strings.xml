@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">New</string>
+    <string name="Search" >Search Country</string>
+    <string name="Search_button">Search</string>
+    <string name="current_location">My weather</string>
+    <string name="forecast_page">My location</string>
 </resources>
